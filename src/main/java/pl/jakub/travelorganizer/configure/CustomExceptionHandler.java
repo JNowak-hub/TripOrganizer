@@ -15,7 +15,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler
 {
     @ExceptionHandler(BadClientData.class)
     public final ResponseEntity<Object> handleUserAlreadyExistsException(BadClientData ex, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
 
