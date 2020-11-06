@@ -8,13 +8,19 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import pl.jakub.travelorganizer.exceptions.BadClientData;
+import pl.jakub.travelorganizer.exceptions.BadGuideData;
 
 @ControllerAdvice
 @RestController
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler
 {
     @ExceptionHandler(BadClientData.class)
-    public final ResponseEntity<Object> handleUserAlreadyExistsException(BadClientData ex, WebRequest request) {
+    public final ResponseEntity<Object> handleBadClientData(BadClientData ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(BadGuideData.class)
+    public final ResponseEntity<Object> handleBadGuideData(BadGuideData ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
