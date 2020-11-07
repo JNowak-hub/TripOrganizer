@@ -2,10 +2,12 @@ package pl.jakub.travelorganizer.service;
 
 import org.springframework.stereotype.Service;
 import pl.jakub.travelorganizer.exceptions.BadGuideData;
+import pl.jakub.travelorganizer.exceptions.GuideNotFound;
 import pl.jakub.travelorganizer.model.Guide;
 import pl.jakub.travelorganizer.repository.GuideRepo;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GuideService {
@@ -14,6 +16,14 @@ public class GuideService {
 
     public GuideService(GuideRepo guideRepo) {
         this.guideRepo = guideRepo;
+    }
+
+    public Guide findGuideById(Long id){
+        Optional<Guide> optionalGuide = guideRepo.findById(id);
+        if(optionalGuide.isEmpty()){
+            throw new GuideNotFound("Guide with id: " + id + " not found");
+        }
+        return optionalGuide.get();
     }
 
     public List<Guide> getAllGuides() {

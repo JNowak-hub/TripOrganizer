@@ -9,6 +9,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import pl.jakub.travelorganizer.exceptions.BadClientData;
 import pl.jakub.travelorganizer.exceptions.BadGuideData;
+import pl.jakub.travelorganizer.exceptions.BadTripData;
+import pl.jakub.travelorganizer.exceptions.GuideNotFound;
 
 @ControllerAdvice
 @RestController
@@ -22,6 +24,16 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler
     @ExceptionHandler(BadGuideData.class)
     public final ResponseEntity<Object> handleBadGuideData(BadGuideData ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(BadTripData.class)
+    public final ResponseEntity<Object> handleBadTripData(BadTripData ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(GuideNotFound.class)
+    public final ResponseEntity<Object> handleGuideNotFound(GuideNotFound ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
 

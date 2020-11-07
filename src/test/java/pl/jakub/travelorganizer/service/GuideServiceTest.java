@@ -5,19 +5,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import pl.jakub.travelorganizer.exceptions.BadClientData;
 import pl.jakub.travelorganizer.exceptions.BadGuideData;
-import pl.jakub.travelorganizer.model.Client;
+import pl.jakub.travelorganizer.exceptions.GuideNotFound;
 import pl.jakub.travelorganizer.model.Guide;
-import pl.jakub.travelorganizer.repository.ClientRepo;
 import pl.jakub.travelorganizer.repository.GuideRepo;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
@@ -37,6 +36,7 @@ public class GuideServiceTest {
         guide = new Guide();
         guide.setFirstName("Adam");
         guide.setLastName("Kowalczyk");
+        guide.setId(1L);
     }
 
     @Test
@@ -86,5 +86,25 @@ public class GuideServiceTest {
         BadGuideData exception = assertThrows(BadGuideData.class, () -> guideService.addNewGuide(guide));
         //then
         assertThat(exception.getMessage()).isEqualTo("Check if all data is filled");
+    }
+
+    @Test
+    void when_findGuideById_then_returnGuide(){
+        //given
+        when(guideRepo.findById(guide.getId())).thenReturn(Optional.ofNullable(guide));
+        //when
+        Guide foundGuide = guideService.findGuideById(1L);
+        //then
+        assertThat(foundGuide).isEqualTo(guide);
+    }
+
+    @Test
+    void when_findGuideById_then_throwGuideNotFoundException(){
+        //given
+        when(guideRepo.findById(any())).thenReturn(Optional.empty());
+        //when
+        GuideNotFound exception = assertThrows(GuideNotFound.class, () -> guideService.findGuideById(1L));
+        //then
+        assertThat(exception.getMessage()).isEqualTo("Guide with id: " + 1 + " not found");
     }
 }
