@@ -5,6 +5,7 @@ import pl.jakub.travelorganizer.model.Trip;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 public class ClientTrip {
@@ -21,6 +22,8 @@ public class ClientTrip {
     private Trip trip;
 
     private BigDecimal finalPrice;
+
+    private LocalDate dateOfBooking = LocalDate.now();
 
     public ClientTrip(ClientTriplId id, Client client, Trip trip) {
         this.id = new ClientTriplId(client.getId(), trip.getId());
@@ -61,5 +64,9 @@ public class ClientTrip {
 
     public void setFinalPrice(BigDecimal finalPrice) {
         this.finalPrice = finalPrice;
+    }
+
+    public LocalDate getTimeOfBooking() {
+        return dateOfBooking;
     }
 }
