@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.jakub.travelorganizer.model.Trip;
 import pl.jakub.travelorganizer.service.TripService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -24,6 +25,11 @@ public class TripController {
     @PostMapping("/{guideId}")
     public ResponseEntity<Trip> addNewTrip(@RequestBody Trip trip, @PathVariable Long guideId){
         return ResponseEntity.ok(tripService.addNewTrip(trip,guideId));
+    }
+
+    @PostMapping("/client")
+    public ResponseEntity<Trip> addClientToTrip(@RequestParam Long tripId, @RequestParam Long clientId, @RequestParam BigDecimal finalPrice){
+        return ResponseEntity.ok(tripService.addClientToTrip(tripId,clientId,finalPrice));
     }
 
 }

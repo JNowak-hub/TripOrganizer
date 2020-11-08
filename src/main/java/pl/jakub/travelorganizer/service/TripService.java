@@ -2,9 +2,14 @@ package pl.jakub.travelorganizer.service;
 
 import org.springframework.stereotype.Service;
 import pl.jakub.travelorganizer.exceptions.BadTripData;
+import pl.jakub.travelorganizer.exceptions.ClientAlreadyAssigned;
 import pl.jakub.travelorganizer.exceptions.TripNotFound;
+import pl.jakub.travelorganizer.model.Client;
 import pl.jakub.travelorganizer.model.Guide;
 import pl.jakub.travelorganizer.model.Trip;
+import pl.jakub.travelorganizer.model.clienttravel.ClientTrip;
+import pl.jakub.travelorganizer.model.clienttravel.ClientTriplId;
+import pl.jakub.travelorganizer.repository.ClientTripRepo;
 import pl.jakub.travelorganizer.repository.TripRepo;
 
 import java.math.BigDecimal;
@@ -18,11 +23,13 @@ public class TripService {
     private TripRepo tripRepo;
     private GuideService guideService;
     private ClientService clientService;
+    private ClientTripRepo clientTripRepo;
 
-    public TripService(TripRepo tripRepo, GuideService guideService, ClientService clientService) {
+    public TripService(TripRepo tripRepo, GuideService guideService, ClientService clientService, ClientTripRepo clientTripRepo) {
         this.tripRepo = tripRepo;
         this.guideService = guideService;
         this.clientService = clientService;
+        this.clientTripRepo = clientTripRepo;
     }
 
     public List<Trip> getAllTrips(){
@@ -39,7 +46,19 @@ public class TripService {
 
     public Trip addClientToTrip(Long tripId, Long clientId, BigDecimal finalPrice){
         Trip trip = getTripById(tripId);
-        return null;
+        Client client = clientService.getClientById(clientId);
+
+        if(clientTripRepo.existsByClientAndTrip(client, trip)){
+            throw new ClientAlreadyAssigned("Client id: " + client.getId() + "is already assigned to trip id: " + trip.getId());
+        }
+
+        ClientTriplId clientTriplId = new ClientTriplId(client.getId(), trip.getId());
+        ClientTrip clientTrip = new ClientTrip(clientTriplId, client, trip);
+        clientTrip.setFinalPrice(finalPrice);
+
+        clientTripRepo.save(clientTrip);
+        trip.getClients().add(clientTrip);
+        return trip;
     }
 
     public Trip addNewTrip(Trip trip, Long guideId){

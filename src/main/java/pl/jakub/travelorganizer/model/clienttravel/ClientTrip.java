@@ -29,7 +29,6 @@ public class ClientTrip {
     }
 
     public ClientTrip() {
-
     }
 
     public ClientTriplId getId() {

@@ -43,4 +43,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler
     public final ResponseEntity<Object> handleClientNotFound(ClientNotFound ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+
+    @ExceptionHandler(ClientAlreadyAssigned.class)
+    public final ResponseEntity<Object> handleClientAlreadyAssigned(ClientAlreadyAssigned ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }
