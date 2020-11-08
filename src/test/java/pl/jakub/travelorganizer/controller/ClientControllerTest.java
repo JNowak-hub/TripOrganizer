@@ -13,16 +13,18 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.jakub.travelorganizer.configure.CustomExceptionHandler;
 import pl.jakub.travelorganizer.exceptions.BadClientData;
+import pl.jakub.travelorganizer.exceptions.ClientNotFound;
 import pl.jakub.travelorganizer.model.Client;
+import pl.jakub.travelorganizer.model.request.ClientRequest;
 import pl.jakub.travelorganizer.service.ClientService;
+import pl.jakub.travelorganizer.util.ClientMapper;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -102,6 +104,46 @@ public class ClientControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(clientToAdd)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void when_updateClient_then_returnStatus404() throws Exception {
+        ClientRequest clientRequest = new ClientRequest();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        when(clientService.updateClient(any(),anyLong())).thenThrow(ClientNotFound.class);
+
+        mockMvc.perform(patch("/client")
+                .param("clientId", "1")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(clientRequest)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void when_updateClient_then_returnUpdatedClient() throws Exception {
+        ClientRequest clientRequest = new ClientRequest();
+        clientRequest.setFirstName("Kuba");
+        clientRequest.setLastName("Kowalczyk");
+
+        Client clientToUpdate = new Client();
+        clientToUpdate.setLastName("Adam");
+        clientToUpdate.setFirstName("Kaczmarczyk");
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        ClientMapper clientMapper = new ClientMapper();
+        clientMapper.updateClient(clientRequest, clientToUpdate);
+
+        when(clientService.updateClient(any(),anyLong())).thenReturn(clientToUpdate);
+
+        mockMvc.perform(patch("/client")
+                .param("clientId", "1")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(clientRequest)))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", is(clientRequest.getFirstName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName", is(clientRequest.getLastName())));
     }
 
 }

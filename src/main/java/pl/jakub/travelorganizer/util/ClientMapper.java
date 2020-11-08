@@ -1,8 +1,10 @@
 package pl.jakub.travelorganizer.util;
 
+import org.springframework.stereotype.Component;
 import pl.jakub.travelorganizer.model.Client;
 import pl.jakub.travelorganizer.model.request.ClientRequest;
 
+@Component
 public class ClientMapper {
 
     public Client updateClient(ClientRequest request, Client clientToUpdate){

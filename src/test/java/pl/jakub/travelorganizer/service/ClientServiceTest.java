@@ -8,7 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import pl.jakub.travelorganizer.exceptions.BadClientData;
 import pl.jakub.travelorganizer.exceptions.ClientNotFound;
 import pl.jakub.travelorganizer.model.Client;
+import pl.jakub.travelorganizer.model.request.ClientRequest;
 import pl.jakub.travelorganizer.repository.ClientRepo;
+import pl.jakub.travelorganizer.util.ClientMapper;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,8 +19,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @SpringBootTest
@@ -26,6 +29,10 @@ public class ClientServiceTest {
 
     @Mock
     private ClientRepo clientRepo;
+
+    @Mock
+    private ClientMapper clientMapper;
+
     @InjectMocks
     private ClientService clientService;
 
@@ -113,12 +120,47 @@ public class ClientServiceTest {
     }
 
     @Test
-    void when_getClientById_then_throwClientNotund(){
+    void when_getClientById_then_throwClientNotFound(){
         //given
         when(clientRepo.findById(anyLong())).thenReturn(Optional.empty());
         //then
         ClientNotFound exception = assertThrows(ClientNotFound.class, () -> clientService.getClientById(1L));
         //then
+        assertThat(exception.getMessage()).isEqualTo("client with id: " + 1 + " doesn't exists");
+    }
+
+    @Test
+    void when_updateClient_then_returnUpdatedClient(){
+        //given
+        ClientRequest clientRequest = new ClientRequest();
+        clientRequest.setFirstName("Mikołaj");
+        when(clientMapper.updateClient(any(),any())).thenCallRealMethod();
+        when(clientRepo.findById(1L)).thenReturn(Optional.of(client));
+        //when
+        clientService.updateClient(clientRequest, 1L);
+        //then
+        assertThat(client.getFirstName()).isEqualTo("Mikołaj");
+    }
+
+    @Test
+    void when_deleteClient_then_returnDeletedClient(){
+        //given
+        when(clientRepo.findById(anyLong())).thenReturn(Optional.of(client));
+        //when
+        Client deletedClient = clientService.deleteClient(1L);
+        //then
+        verify(clientRepo).delete(client);
+        assertThat(deletedClient).isEqualTo(client);
+    }
+
+    @Test
+    void when_deleteClient_then_throwClientNotFound(){
+        //given
+        when(clientRepo.findById(anyLong())).thenReturn(Optional.empty());
+        //when
+        ClientNotFound exception = assertThrows(ClientNotFound.class, () -> clientService.deleteClient(1L));
+        //then
+        verify(clientRepo, never()).delete(any());
         assertThat(exception.getMessage()).isEqualTo("client with id: " + 1 + " doesn't exists");
     }
 }

@@ -4,8 +4,11 @@ import org.springframework.stereotype.Service;
 import pl.jakub.travelorganizer.exceptions.BadClientData;
 import pl.jakub.travelorganizer.exceptions.ClientNotFound;
 import pl.jakub.travelorganizer.model.Client;
+import pl.jakub.travelorganizer.model.request.ClientRequest;
 import pl.jakub.travelorganizer.repository.ClientRepo;
+import pl.jakub.travelorganizer.util.ClientMapper;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,9 +16,29 @@ import java.util.Optional;
 public class ClientService {
 
     private ClientRepo clientRepo;
+    private ClientMapper clientMapper;
 
-    public ClientService(ClientRepo clientRepo) {
+    public ClientService(ClientRepo clientRepo, ClientMapper clientMapper) {
         this.clientRepo = clientRepo;
+        this.clientMapper = clientMapper;
+    }
+
+    @Transactional
+    public Client deleteClient(Long id){
+        Client clientToDelete = getClientById(id);
+
+        clientRepo.delete(clientToDelete);
+
+        return clientToDelete;
+    }
+
+    @Transactional
+    public Client updateClient(ClientRequest clientRequest, Long clientId){
+        Client client = getClientById(clientId);
+
+        clientMapper.updateClient(clientRequest, client);
+
+        return  clientRepo.save(client);
     }
 
     public List<Client> getAllClients(){

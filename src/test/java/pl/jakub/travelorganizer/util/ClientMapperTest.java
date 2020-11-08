@@ -36,7 +36,6 @@ public class ClientMapperTest {
         assertThat(client.getFirstName()).isEqualTo(clientRequest.getFirstName());
         assertThat(client.getLastName()).isEqualTo(clientRequest.getLastName());
         assertThat(client.getPassportNumber()).isEqualTo(clientRequest.getPassportNumber());
-
     }
     
     @Test
