@@ -146,4 +146,35 @@ public class ClientControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.lastName", is(clientRequest.getLastName())));
     }
 
+    @Test
+    void when_deleteClient_then_returnDeletedClient() throws Exception {
+        Client clientToDelete = new Client();
+        clientToDelete.setFirstName("Kuba");
+        clientToDelete.setLastName("Kowalczyk");
+
+        ClientMapper clientMapper = new ClientMapper();
+
+        when(clientService.deleteClient(anyLong())).thenReturn(clientToDelete);
+
+        mockMvc.perform(delete("/client")
+                .param("clientId", "1"))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", is(clientToDelete.getFirstName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName", is(clientToDelete.getLastName())));
+    }
+    @Test
+    void when_deleteClient_then_returnStatus400() throws Exception {
+        Client clientToDelete = new Client();
+        clientToDelete.setFirstName("Kuba");
+        clientToDelete.setLastName("Kowalczyk");
+
+        ClientMapper clientMapper = new ClientMapper();
+
+        when(clientService.deleteClient(anyLong())).thenThrow(ClientNotFound.class);
+
+        mockMvc.perform(delete("/client")
+                .param("clientId", "1"))
+                .andExpect(status().isNotFound());
+    }
+
 }

@@ -32,4 +32,9 @@ public class ClientController {
     public ResponseEntity<Client> updateClient(@RequestBody ClientRequest clientRequest, @RequestParam Long clientId){
         return ResponseEntity.ok(clientService.updateClient(clientRequest, clientId));
     }
+
+    @DeleteMapping
+    public ResponseEntity<Client> deleteClient(@RequestParam Long clientId){
+        return ResponseEntity.ok(clientService.deleteClient(clientId));
+    }
 }
