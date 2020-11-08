@@ -1,5 +1,7 @@
 package pl.jakub.travelorganizer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -13,7 +15,7 @@ public class Guide {
     private String firstName;
     private String lastName;
 
-    @OneToMany
+    @OneToMany(mappedBy = "guide", fetch = FetchType.LAZY)
     private List<Trip> trips;
 
     public Long getId() {
@@ -40,6 +42,7 @@ public class Guide {
         this.lastName = lastName;
     }
 
+    @JsonIgnore
     public List<Trip> getTrips() {
         return trips;
     }

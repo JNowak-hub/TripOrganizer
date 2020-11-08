@@ -1,5 +1,6 @@
 package pl.jakub.travelorganizer.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import pl.jakub.travelorganizer.model.clienttravel.ClientTrip;
 
 import javax.persistence.*;
@@ -16,11 +17,14 @@ public class Trip {
     private Long id;
 
     private String destiny;
+    @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDate dateOfDeparture;
+    @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDate dateOfReturn;
     private BigDecimal suggestedPrice;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "guide_id")
     private Guide guide;
 
     @OneToMany(

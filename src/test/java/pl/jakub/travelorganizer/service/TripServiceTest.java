@@ -5,22 +5,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import pl.jakub.travelorganizer.exceptions.BadGuideData;
-import pl.jakub.travelorganizer.exceptions.GuideNotFound;
+import pl.jakub.travelorganizer.exceptions.BadTripData;
 import pl.jakub.travelorganizer.model.Guide;
 import pl.jakub.travelorganizer.model.Trip;
-import pl.jakub.travelorganizer.repository.GuideRepo;
 import pl.jakub.travelorganizer.repository.TripRepo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -61,6 +57,68 @@ public class TripServiceTest {
         Trip newTrip = tripService.addNewTrip(trip, 1L);
         //then
         assertThat(newTrip).isEqualTo(trip);
+    }
 
+    @Test
+    void when_addNewTripWithNull_then_throw_BadTripData(){
+        //given
+        trip = null;
+        //when
+        BadTripData exception = assertThrows(BadTripData.class, () -> tripService.addNewTrip(trip,1L));
+        //then
+        assertThat(exception.getMessage()).isEqualTo("trip cannot be null");
+    }
+
+    @Test
+    void when_addNewTripWithBadDesteni_then_throw_BadTripData(){
+        //given
+        trip.setDestiny("");
+        //when
+        BadTripData exception = assertThrows(BadTripData.class, () -> tripService.addNewTrip(trip,1L));
+        //then
+        assertThat(exception.getMessage()).isEqualTo("destiny cannot be empty");
+    }
+
+    @Test
+    void when_addNewTripWithBadDepartureDate_then_throw_BadTripData(){
+        //given
+        LocalDate dateInPast = LocalDate.now().minusDays(2);
+        trip.setDateOfDeparture(dateInPast);
+        //when
+        BadTripData exception = assertThrows(BadTripData.class, () -> tripService.addNewTrip(trip,1L));
+        //then
+        assertThat(exception.getMessage()).isEqualTo("departure time cannot be in the past");
+    }
+
+    @Test
+    void when_addNewTripWithBadReturnDate_then_throw_BadTripData(){
+        //given
+        LocalDate dateInPast = trip.getDateOfDeparture().minusDays(1);
+        trip.setDateOfReturn(dateInPast);
+        //when
+        BadTripData exception = assertThrows(BadTripData.class, () -> tripService.addNewTrip(trip,1L));
+        //then
+        assertThat(exception.getMessage()).isEqualTo("return date cannot be before return date");
+    }
+
+    @Test
+    void when_addNewTripWithBadSuggestetPrice_then_throw_BadTripData(){
+        //given
+        trip.setSuggestedPrice(BigDecimal.valueOf(0));
+        //when
+        BadTripData exception = assertThrows(BadTripData.class, () -> tripService.addNewTrip(trip,1L));
+        //then
+        assertThat(exception.getMessage()).isEqualTo("suggested price cannot be less or equal 0.00");
+    }
+
+    @Test
+    void when_getAllTrip_return_listOfTrips(){
+        //given
+        List<Trip> trips = Arrays.asList(trip, trip, trip);
+        when(tripRepo.findAll()).thenReturn(trips);
+        //when
+        List<Trip> returnedTrips = tripService.getAllTrips();
+        //then
+        assertThat(returnedTrips).isEqualTo(trips);
     }
 }

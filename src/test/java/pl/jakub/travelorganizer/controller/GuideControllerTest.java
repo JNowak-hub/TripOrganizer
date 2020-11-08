@@ -86,7 +86,7 @@ public class GuideControllerTest {
     }
 
     @Test
-    void when_addGuide_then_returnStatus409() throws Exception {
+    void when_addGuide_then_returnStatus400() throws Exception {
         Guide guideToAdd = new Guide();
 
         ObjectMapper objectMapper = new ObjectMapper();

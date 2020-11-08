@@ -6,15 +6,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.jakub.travelorganizer.exceptions.BadClientData;
+import pl.jakub.travelorganizer.exceptions.ClientNotFound;
 import pl.jakub.travelorganizer.model.Client;
 import pl.jakub.travelorganizer.repository.ClientRepo;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 
@@ -97,5 +100,25 @@ public class ClientServiceTest {
         List<Client> returnedClients = clientService.getAllClients();
         //then
         assertThat(returnedClients).isEqualTo(clientList);
+    }
+
+    @Test
+    void when_getClientById_then_return_client(){
+        //given
+        when(clientRepo.findById(anyLong())).thenReturn(Optional.of(client));
+        //when
+        Client returnedClient = clientService.getClientById(1L);
+        //then
+        assertThat(returnedClient).isEqualTo(client);
+    }
+
+    @Test
+    void when_getClientById_then_throwClientNotund(){
+        //given
+        when(clientRepo.findById(anyLong())).thenReturn(Optional.empty());
+        //then
+        ClientNotFound exception = assertThrows(ClientNotFound.class, () -> clientService.getClientById(1L));
+        //then
+        assertThat(exception.getMessage()).isEqualTo("client with id: " + 1 + " doesn't exists");
     }
 }
