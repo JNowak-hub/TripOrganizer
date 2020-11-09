@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/guide")
+@CrossOrigin("*")
 public class GuideController {
 
     private GuideService guideService;

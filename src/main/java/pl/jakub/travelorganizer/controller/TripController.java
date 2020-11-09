@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/trip")
+@CrossOrigin("*")
 public class TripController {
     private TripService tripService;
 
@@ -23,7 +24,7 @@ public class TripController {
     }
 
     @PostMapping("/{guideId}")
-    public ResponseEntity<Trip> addNewTrip(@RequestBody Trip trip, @PathVariable Long guideId){
+    public ResponseEntity<Trip> addNewTrip(@RequestBody Trip trip, @PathVariable(name = "guideId") Long guideId){
         return ResponseEntity.ok(tripService.addNewTrip(trip,guideId));
     }
 
