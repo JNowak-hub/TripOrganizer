@@ -1,5 +1,6 @@
 package pl.jakub.travelorganizer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.jakub.travelorganizer.model.clienttravel.ClientTrip;
 
 import javax.persistence.*;
@@ -17,6 +18,7 @@ public class Client {
     private String lastName;
     private String passportNumber;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "client",
             cascade = CascadeType.ALL,
